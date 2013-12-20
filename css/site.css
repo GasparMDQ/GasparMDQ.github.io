@@ -1,0 +1,23 @@
+img.thumb{
+    height: 45px;
+}
+
+img.detail{
+    height: 250px;
+}
+
+img.slide{
+    height: 100px;
+}
+
+ul {
+    list-style-type: none;
+}
+
+.orbit-slides-container{
+  height: 500px !important; 
+}
+
+th.full-width {
+  width: 100%;
+}

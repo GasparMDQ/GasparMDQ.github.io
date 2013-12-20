@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Web UI - Nivel 3 - Modulo 1</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="css/foundation.min.css" rel="stylesheet">        
+    <link href="css/site.css" rel="stylesheet">        
+    <script src="js/lib/require.js" data-main="js/app"></script>
+  </head>
+  <body>
+    <div class="inner-wrap">
+      <header id="navbar">
+      </header>
+      <section id="products-top" class="row">
+      </section>
+      <section role="main">
+        <div class="row">
+          <div id="products-list" class="medium-4 columns">
+          </div>
+          <div class="medium-8 columns" id="shopping-cart-sidebar">
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script type="text/template" id="navigation-tmpl">
+      <nav class="top-bar" data-topbar>
+        <ul class="title-area">
+          <li class="name">
+            <h1><a href="#">Shopping Cart</a></h1>
+          </li>
+          <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+        </ul>
+
+        <section class="top-bar-section">
+          <!-- Right Nav Section -->
+          <ul class="right">
+            <li><a href="#checkout">Items on Cart: <span class="badge"><%- cartItems %></span></a></li>
+          </ul>
+
+          <!-- Left Nav Section -->
+          <ul class="left">
+            <li><a href="#list">Products List</a></li>
+            <li><a href="#newProduct">New Product</a></li>
+          </ul>
+        </section>
+      </nav>
+    </script>
+    
+    <script type="text/template" id="products-list-tmpl">
+      <h2>Products List</h2>
+      <p></p>
+      <ul>
+        <% _.each(products, function(product) { %>
+        <li>
+          <p>
+            <%- product.name %>
+            <img src="<%- product.image %>" class="img-rounded thumb">
+            <button type="button" class="btn-details button radius tiny right" value="<%- product.id %>">
+              <span>Details</span>
+            </button>
+          </p>
+        </li>
+        <% }); %>
+      </ul>
+    </script> 
+    
+    <script type="text/template" id="products-details-tmpl">
+      <h3><%- product.name %></h3>
+      <img src="<%- product.image %>" class="img-thumbnail detail">
+      <dl class="dl-horizontal">
+        <dt>Price:</dt>
+          <dd>$<%- product.precio %></dd>
+        <dt>Description:</dt>
+          <dd><%- product.descripcion %></dd>
+      </dl>
+      
+      <div class="small-6 columns">
+        <div class="row collapse">
+          <div class="small-9 columns">
+            <button type="button" class="prefix button radius left <% if(!inCart) {%>btn-add-cart<% }else{ %>disabled<% } %>" value="<%- product.id %>">
+              <span><% if(!inCart) {%>Add to Cart<% }else{ %>Already in Cart<% } %></span>
+            </button>
+          </div>
+          <% if(!inCart) {%>
+            <div class="small-3 columns">
+              <input type="number" id="amount_form" class="form-control" placeholder="Quantity" required value="1" min="1">
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </script>      
+    
+    <script type="text/template" id="products-new-tmpl">
+      <h2>New Product</h2>
+      <p></p>
+      <div class="row">
+        <div class="medium-3 column">
+          <label for="name_form">Name</label>
+          <input type="text" id="name_form" class="form-control" placeholder="Nokia Lumia" required>
+        </div>
+        <div class="medium-3 column">
+          <label for="price_form">Price</label>
+          <input type="text" id="price_form" class="form-control" placeholder="500" required>
+        </div>
+        <div class="medium-3 column">
+          <label for="desc_form">Description</label>
+          <input type="text" id="desc_form" class="form-control" placeholder="It's a great cellphone!" required>
+        </div>
+        <div class="medium-3 column">
+          <label for="image_form">Image URL</label>
+          <input type="text" id="image_form" class="form-control" placeholder="images/cellphone.jpg" required>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" class="button radius btn-add success tiny left"><span>Add to Warehouse</span></button>
+        <% if(collectionLenght==0) {%>
+          <button type="button" class="button radius btn-add-fix secondary tiny left"><span>Load Fixture</span></button>
+        <%}%>
+      </div>
+    </script>      
+    
+    
+    <script type="text/template" id="products-slide-tmpl">
+      <% if (hasItems!=0) { %>
+        <ul class="example-orbit" data-orbit>
+          <% _.each(products, function(product, idx) { %>
+            <li>
+              <img src="<%- product.image %>" alt="slide <%- idx%>" />
+              <div class="orbit-caption">
+                <h3><%- product.name %></h3>
+                <p>$<%- product.precio %></p>
+                <p><%- product.descripcion %></p>
+                <button type="button" class="small right <% if(!inCart(product.id)) {%>btn-add-cart<% }else{ %>disabled<% } %>" value="<%- product.id %>">
+                  <span><% if(!inCart(product.id)) {%>Add to Cart<% }else{ %>Already in Cart<% } %></span>
+                </button>
+              </div>
+            </li>
+          <% }); %>
+        </ul>
+      <% }else{ %>
+        <h2>No items to show!</h2>
+        <a href="#newProduct">Add Items to WareHouse</a>
+      <% } %>
+    </script>
+    
+    <script type="text/template" id="cart-tmpl">
+      <% if (hasItems!=0) { %>
+        <h2>Your Cart</h2>
+        <p></p>
+        <table>
+          <thead>
+            <tr>
+              <th width="1920px">Item Name</th>
+              <th width="150px">Price</th>
+              <th width="50px">Quantity</th>
+              <th width="150px">Total</th>
+              <th width="5px">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% _.each(items, function(item) { %>
+              <tr data-id=<%- item.id %>>
+                <td><%- item.name %></td>
+                <td>$ <%- item.precio %></td>
+                <td>
+                  <input type="number" id="amount_form" class="qty-input" placeholder="Quantity" required value="<%- item.cantidad %>" min="1">
+                </td>
+                <td>$ <%- item.cantidad * Number(item.precio) %></td>
+                <td>
+                  <button type="button" class="alert tiny btn-remove-item">
+                    <span>Remove</span>
+                  </button>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan=3></td>
+              <td>$ 
+                <%= _.reduce(items, function(sum, item){return sum+(item.cantidad * Number(item.precio));}, 0) %>              
+              </td>
+              <td>
+                <button type="button" class="tiny btn-checkout">
+                  <span>CheckOut</span>
+                </button>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      <% }else{ %>
+        <h2>Your cart is empty!</h2>
+      <% } %>
+    </script>
+  </body>
+</html>
