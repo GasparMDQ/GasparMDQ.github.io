@@ -50,7 +50,12 @@ require(['jquery', 'underscore', 'backbone', 'localstorage', 'jquery.foundation'
         name:'',
         precio:''
       };
+    },
+    validate: function(attrs, options) {
+    if (attrs.cantidad < 1) {
+      return "qty must be equal or greater than 1";
     }
+  }
   });
   
   var Lineadecaja = Backbone.Collection.extend({
@@ -225,6 +230,7 @@ require(['jquery', 'underscore', 'backbone', 'localstorage', 'jquery.foundation'
     },
     
     render: function () {
+      LineaDeCaja.fetch();
       this.$el.html(this.template({
         items: LineaDeCaja.toJSON(),
         hasItems: LineaDeCaja.length
@@ -252,7 +258,11 @@ require(['jquery', 'underscore', 'backbone', 'localstorage', 'jquery.foundation'
       var id = $(ev.target).closest('tr').data('id');
       var item = LineaDeCaja.get(id);
       item.set('cantidad', parseInt($(ev.target).val()));
-      item.save();
+      if (!item.isValid()) {
+        alert(item.get('name') + ' ' + item.validationError);
+      } else {
+        item.save();
+      }
       this.render();
     }
   });
@@ -337,8 +347,13 @@ require(['jquery', 'underscore', 'backbone', 'localstorage', 'jquery.foundation'
         name: item.name,
         precio: item.precio
       });
-      LineaDeCaja.add(nItem);
-      nItem.save();
+      if (!nItem.isValid()) {
+        alert(nItem.get('name') + ' ' + nItem.validationError);
+        return false;
+      } else {
+        LineaDeCaja.add(nItem);
+        nItem.save();
+      }
     } else {
       return false;
     }
